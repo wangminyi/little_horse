@@ -1,0 +1,77 @@
+/ rewards type
+table.table.table-striped.table-hover
+  - if type == "reward"
+    thead
+      tr
+        td 表彰名称
+        td 表彰时间
+        td 表彰性质
+        td 表彰单位
+        td 承办单位
+        td 集体/个人名额数
+        td 获奖文件
+    tbody
+      - rewards.each do |reward|
+        tr
+          td = reward.name
+          td = reward.reward_at.strftime("%F")
+          td = reward.reward_nature
+          td = reward.reward_company
+          td = reward.undertake_company
+          td = reward.project_company
+          td
+            - if reward.file.url
+              = link_to "获奖文件", reward.file.url, target: "_blank"
+  - elsif type == "person"
+    thead
+      tr
+        td 获奖人姓名
+        td 表彰名称
+        td 表彰时间
+        td 表彰性质
+        td 表彰单位
+        td 承办单位
+        td 享受待遇
+        td 单位职务
+        td 表彰文件
+    tbody
+      - rewards.each do |reward|
+        tr
+          td = reward.person_name
+          td = reward.name
+          td = reward.reward_at.strftime("%F")
+          td = reward.reward_nature
+          td = reward.reward_company
+          td = reward.undertake_company
+          td = reward.person_salary
+          td = reward.person_work_info
+          td
+            - if reward.file.url
+              = link_to "获奖文件", reward.file.url, target: "_blank"
+
+  - elsif type == "project"
+    thead
+      tr
+        td 项目名称
+        td 表彰名称
+        td 表彰时间
+        td 表彰性质
+        td 表彰单位
+        td 承办单位
+        td 主要完成单位
+        td 主要完成人
+        td 表彰文件
+    tbody
+      - rewards.each do |reward|
+        tr
+          td = reward.project_name
+          td = reward.name
+          td = reward.reward_at.strftime("%F")
+          td = reward.reward_nature
+          td = reward.reward_company
+          td = reward.undertake_company
+          td = reward.project_company
+          td = reward.project_member
+          td
+            - if reward.file.url
+              = link_to "获奖文件", reward.file.url, target: "_blank"

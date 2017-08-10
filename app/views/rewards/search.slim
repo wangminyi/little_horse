@@ -1,0 +1,62 @@
+.container
+  h1 查询奖励
+
+  .panel.panel-default
+    .panel-heading
+      | 查询条件
+    .panel-body
+      .search-container data-search-type="reward"
+        .search-field-wrapper
+          label 奖励名称
+          input.form-control data-param="name"
+        .search-field-wrapper
+          label 奖励年份
+          input.form-control data-param="reward_at"
+        .btn.btn-primary.search-button 查询
+      .search-container data-search-type="person"
+        .search-field-wrapper
+          label 获奖人姓名
+          input.form-control data-param="person_name"
+        .btn.btn-primary.search-button 查询
+      .search-container data-search-type="project"
+        .search-field-wrapper
+          label 获奖项目
+          input.form-control data-param="project_name"
+        .btn.btn-primary.search-button 查询
+
+  .result-container
+
+scss:
+  .search-container {
+    margin-bottom: 30px;
+  }
+  .search-field-wrapper {
+    display: inline-block;
+    width: 200px;
+    margin-right: 20px;
+  }
+
+javascript:
+  $(function(){
+    $(".search-button").on("click", function() {
+      var $container = $(this).parents(".search-container"),
+          params = {
+            q: {},
+            type: $container.data("search-type")
+          };
+
+      $container.find("input").each(function(index, ele){
+        var $ele = $(ele),
+            key  = $ele.data("param"),
+            value = $ele.val();
+        if (value !== "") {
+          params.q[key] = value;
+        }
+      });
+      if (Object.keys(params.q).length > 0) {
+        $.get("search_rewards", params).done(function(ret){
+          $(".result-container").html(ret.html);
+        });
+      }
+    });
+  })

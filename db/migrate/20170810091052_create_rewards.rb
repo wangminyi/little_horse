@@ -6,7 +6,7 @@ class CreateRewards < ActiveRecord::Migration[5.0]
       t.string :undertake_company
       t.string :reward_nature
       t.string :reward_type
-      t.datetime :reward_at
+      t.date :reward_at
       t.string :file
       t.string :person_name
       t.string :person_gender

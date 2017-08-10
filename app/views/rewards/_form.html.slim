@@ -1,17 +1,48 @@
-<%= form_for(reward) do |f| %>
-  <% if reward.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(reward.errors.count, "error") %> prohibited this reward from being saved:</h2>
+/ <%= form_for(reward) do |f| %>
+/   <% if reward.errors.any? %>
+/     <div id="error_explanation">
+/       <h2><%= pluralize(reward.errors.count, "error") %> prohibited this reward from being saved:</h2>
 
-      <ul>
-      <% reward.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+/       <ul>
+/       <% reward.errors.full_messages.each do |message| %>
+/         <li><%= message %></li>
+/       <% end %>
+/       </ul>
+/     </div>
+/   <% end %>
 
-  <div class="actions">
-    <%= f.submit %>
-  </div>
-<% end %>
+/   <div class="actions">
+/     <%= f.submit %>
+/   </div>
+/ <% end %>
+
+= simple_form_for reward do |f|
+  = f.input :name, label: "表彰名称"
+  = f.input :reward_company, label: "表彰单位"
+  = f.input :undertake_company, label: "承办单位"
+  = f.input :reward_nature, label: "表彰性质"
+  = f.input :reward_type, label: "集体/个人"
+  .form-group
+    label 表彰日期
+    = f.date_field :reward_at, class: "form-control"
+  / = f.input :reward_at, as: :date, label: "表彰日期"
+  = f.input :file, label: "表彰文件"
+  = f.input :person_name, label: "获奖人姓名"
+  = f.input :person_gender, label: "获奖人性别"
+  = f.input :person_work_info, label: "工作单位和职务"
+  = f.input :person_salary, label: "享受待遇"
+  = f.input :project_name, label: "获奖项目"
+  = f.input :project_company, label: "主要完成单位"
+  = f.input :project_member, label: "主要完成人"
+
+  .right
+    = f.submit "保存", class: "btn btn-primary"
+
+scss:
+  form {
+    width: 600px;
+    padding: 30px 0;
+    .right {
+      text-align: right;
+    }
+  }
