@@ -12,6 +12,8 @@ template#entry-index-template
           | {{ test.title}}
         .desc
           | {{ test.desc}}
+        .answer
+          | {{ $root.result(test) }}
 
 template#question-show-template
   #question-show
@@ -34,7 +36,7 @@ template#question-show-template
 template#test-result
   .result-container
     .result
-      | {{ result }}
+      | {{ "测试结果： " + result }}
     router-link to="/"
       .btn.btn-primary
         | 返回
@@ -110,31 +112,8 @@ javascript:
         test () {
           return this.$root.tests[this.test_id - 1];
         },
-        is_finish () {
-          return this.test.questions.filter((question) => {
-            return question.checked_index === null
-          }).length === 0;
-        },
-        score () {
-          let score = 0;
-          this.test.questions.forEach((question) => {
-            score += this.$root.scores[question.checked_index]
-          })
-          return score;
-        },
         result () {
-          if (this.is_finish) {
-            let result = "";
-            $.each(this.test.summary, (index, value) => {
-              if ( this.score < value[0]) {
-                result = value[1];
-                return false;
-              }
-            });
-            return result;
-          } else {
-            return "尚未完成答题";
-          }
+          return this.$root.result(this.test);
         }
       },
     }
@@ -206,37 +185,38 @@ javascript:
       },
       computed: {
         current_question () {
-          this.$route.params.index
+          return this.$route.params.index;
+        }
+      },
+      methods: {
+        is_finished (test) {
+          return test.questions.filter((question) => {
+            return question.checked_index === null
+          }).length === 0;
+        },
+        score (test) {
+          let score = 0;
+          test.questions.forEach((question) => {
+            score += this.$root.scores[question.checked_index]
+          })
+          return score;
+        },
+        result (test) {
+          if (this.is_finished(test)) {
+            let result = "",
+                score = this.score(test);
+            $.each(test.summary, (index, value) => {
+              if ( score < value[0]) {
+                result = value[1];
+                return false;
+              }
+            });
+            return result;
+          } else {
+            return "尚未完成答题";
+          }
         }
       },
       router,
     }).$mount("#main-root")
   })
-
-scss:
-  $theme-blue: rgb(129, 216, 206);
-  body {
-    background-color: $theme-blue;
-  }
-  #main-root {
-    width: 100%;
-    max-width: 600px;
-    padding: 20px;
-  }
-
-  .entry-block {
-    margin-bottom: 20px;
-    border: 1px solid black;
-    padding: 10px;
-    .desc {
-      margin-top: 20px;
-    }
-  }
-
-  #question-show {
-    .option {
-      &.checked {
-        color: red;
-      }
-    }
-  }
