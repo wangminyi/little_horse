@@ -4,7 +4,7 @@
 # You can define all roles on a single server, or split them:
 
 server "47.92.36.220", user: "root", roles: %w{app db web}
-set :nginx_server_name, 'demo.yylife.shop'
+set :nginx_server_name, 'demo.love-mango.com'
 # server "example.com", user: "deploy", roles: %w{app db web}, my_property: :my_value
 # server "example.com", user: "deploy", roles: %w{app web}, other_property: :other_value
 # server "db.example.com", user: "deploy", roles: %w{db}
@@ -61,4 +61,4 @@ set :nginx_server_name, 'demo.yylife.shop'
 #     auth_methods: %w(publickey password)
 #     # password: "please use keys"
 #   }
-set :puma_bind, 'tcp://127.0.0.1:5001'
+# set :puma_bind, 'tcp://127.0.0.1:5001'
