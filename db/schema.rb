@@ -10,7 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170810091052) do
+ActiveRecord::Schema.define(version: 20170929011208) do
+
+  create_table "items", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "rewards", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "name"
@@ -18,7 +23,7 @@ ActiveRecord::Schema.define(version: 20170810091052) do
     t.string   "undertake_company"
     t.string   "reward_nature"
     t.string   "reward_type"
-    t.datetime "reward_at"
+    t.date     "reward_at"
     t.string   "file"
     t.string   "person_name"
     t.string   "person_gender"

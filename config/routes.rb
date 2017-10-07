@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
   root "home#index"
 
+  get "tests", to: "home#tests"
+  get "tests/*path", to: "home#tests"
+
   resources :rewards do
     collection do
       get :search

@@ -16,7 +16,8 @@ html
     = include_gon
 
   body
-    = render partial: "layouts/header"
+    - unless @no_header
+      = render partial: "layouts/header"
 
     = yield
 

@@ -50,6 +50,9 @@ gem 'redis-objects'
 gem 'slack-notifier'
 gem 'carrierwave'
 
+gem 'docx'
+gem 'vuejs-rails'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri

@@ -1,0 +1,242 @@
+#main-root v-cloak=true
+  router-view
+
+
+template#entry-index-template
+  #entry-index
+    .entry-block (
+      v-for="(test, index) in tests"
+    )
+      router-link :to="(index + 1) + '/questions/1'"
+        .title
+          | {{ test.title}}
+        .desc
+          | {{ test.desc}}
+
+template#question-show-template
+  #question-show
+    .question
+      | {{ question.question}}
+    .options
+      .option (
+        v-for="(option, index) in question.answers"
+        :class="{checked: question.checked_index === index}"
+        @touchend="select_option(index)"
+      )
+        | {{ option }}
+    / router-link v-if="!is_first" :to="prev_question_link"
+    /   .btn.btn-primary
+    /     | 上一题
+    / router-link v-if="!is_last" :to="next_question_link"
+    /   .btn.btn-primary
+    /     | 下一题
+
+template#test-result
+  .result-container
+    .result
+      | {{ result }}
+    router-link to="/"
+      .btn.btn-primary
+        | 返回
+
+
+
+javascript:
+  $(function() {
+    var Index = {
+      template: "#entry-index-template",
+      data () {
+        return {
+          tests: this.$root.tests
+        }
+      }
+    }
+
+    var Question = {
+      template: "#question-show-template",
+      computed: {
+        // ID 从 1 开始
+        test_id () {
+          return this.$route.params.test_id * 1;
+        },
+        question_id () {
+          return this.$route.params.question_id * 1;
+        },
+        questions () {
+          return this.$root.tests[this.test_id - 1].questions;
+        },
+        question () {
+          return this.questions[this.question_id - 1];
+        },
+        is_first () {
+          return this.question_id === 1;
+        },
+        is_last () {
+          return this.question_id === this.questions.length;
+        },
+        prev_question_link () {
+          return (this.question_id - 1) + "";
+        },
+        next_question_link () {
+          return (this.question_id + 1) + "";
+        },
+        result_link () {
+          return "/" + this.test_id + "/result";
+        }
+      },
+      methods: {
+        select_option (index) {
+          this.question.checked_index = index;
+          setTimeout(() => {
+            if (this.is_last) {
+              this.$router.push(this.result_link);
+            } else {
+              this.$router.push(this.next_question_link);
+            }
+          }, 200);
+        }
+      },
+      beforeCreate () {
+
+      }
+    }
+
+    var Result = {
+      template: "#test-result",
+      computed: {
+        test_id () {
+          return this.$route.params.test_id * 1;
+        },
+        test () {
+          return this.$root.tests[this.test_id - 1];
+        },
+        is_finish () {
+          return this.test.questions.filter((question) => {
+            return question.checked_index === null
+          }).length === 0;
+        },
+        score () {
+          let score = 0;
+          this.test.questions.forEach((question) => {
+            score += this.$root.scores[question.checked_index]
+          })
+          return score;
+        },
+        result () {
+          if (this.is_finish) {
+            let result = "";
+            $.each(this.test.summary, (index, value) => {
+              if ( this.score < value[0]) {
+                result = value[1];
+                return false;
+              }
+            });
+            return result;
+          } else {
+            return "尚未完成答题";
+          }
+        }
+      },
+    }
+
+    var NotFound = {
+      template: "<div>Not Found</div>"
+    }
+
+    var router = new VueRouter({
+      mode: 'history',
+      base: '/tests',
+      routes: [
+        { path: '/', component: Index },
+        { path: '/:test_id/questions/:question_id', component: Question },
+        { path: '/:test_id/result', component: Result },
+        { path: '*', component: NotFound },
+      ]
+    });
+
+    gon.test_data.forEach( test => {
+      test.forEach( question => {
+        question.checked_index = null;
+      });
+    });
+
+    new Vue({
+      data: {
+        scores: [1, 2, 3, 4, 2.5],
+        selected_test: null,
+        tests: [
+          {
+            title: "干性皮肤（Dry - D）VS. 油性皮肤(Oil - O)",
+            desc: "通过回答这部分的问题，可以准确分析出皮肤的含水状况和出油程度。研究表明，虽然许多人对于自己属于油性或干性皮肤显得很确定，但其实这些预见往往并不准确。别让自己的那些成见或主观臆断影响你的回答，只要根据实际情况来选择就对了。",
+            questions: gon.test_data[0],
+            summary: [
+              [16, "非常干的皮肤"],
+              [26, "轻微的干性皮肤"],
+              [33, "轻微的油性皮肤"],
+              [44, "非常油的皮肤"],
+            ]
+          }, {
+            title: "敏感性皮肤（Sensitive－S）VS.耐受性皮肤(Resistant－R)",
+            desc: "通过回答这部分的问题，可以准确分析出你的皮肤趋向于发生各种敏感肌肤症状的程度，所有的面疱（痤疮/痘痘）、红肿、潮红、发痒都属于皮肤的敏感症状。",
+            questions: gon.test_data[1],
+            summary: [
+              [24, "耐受性很强的皮肤"],
+              [29, "比较有耐受性的皮肤 "],
+              [33, "轻微的油性皮肤"],
+              [72, "非常油的皮肤"],
+            ]
+          }, {
+            title: "色素沉着性皮肤（Pigmented－P）VS.非色素沉着性皮肤(Non-pigmented－N)",
+            desc: "通过回答这部分的问题，测试你是否有形成黑色素的倾向。黑色素会使你受到日晒后的皮肤出现黑斑、雀斑以及一些深色区域。反过来说，黑色素的生成也是皮肤自我保护的反应，它会通过使肤色变深来保护你不被晒伤。",
+            questions: gon.test_data[2],
+            summary: [
+              [30, "非色素沉着性皮肤（简称“非”型或N Type）"],
+              [45, "色素沉着性皮肤（简称“色”型或P Type）"],
+            ]
+          }, {
+            title: "皱纹性皮肤（wrinkled－W）VS.紧致性皮肤Tight－T) ",
+            desc: "通过回答这部分的问题，可以准确分析出你的皮肤是否属于容易生出皱纹的类型，以及你现在的已经出现的皱纹危机。",
+            questions: gon.test_data[3],
+            summary: [
+              [40, "紧致性皮肤（简称“紧”型或T Type）"],
+              [85, "皱纹性皮肤（简称“皱”型或W Type）"],
+            ]
+          }
+        ]
+      },
+      computed: {
+        current_question () {
+          this.$route.params.index
+        }
+      },
+      router,
+    }).$mount("#main-root")
+  })
+
+scss:
+  $theme-blue: rgb(129, 216, 206);
+  body {
+    background-color: $theme-blue;
+  }
+  #main-root {
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+  }
+
+  .entry-block {
+    margin-bottom: 20px;
+    border: 1px solid black;
+    padding: 10px;
+    .desc {
+      margin-top: 20px;
+    }
+  }
+
+  #question-show {
+    .option {
+      &.checked {
+        color: red;
+      }
+    }
+  }
