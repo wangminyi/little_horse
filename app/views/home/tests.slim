@@ -23,7 +23,7 @@ template#question-show-template
       .option (
         v-for="(option, index) in question.answers"
         :class="{checked: question.checked_index === index}"
-        @touchend="select_option(index)"
+        @click="select_option(index)"
       )
         | {{ option }}
     / router-link v-if="!is_first" :to="prev_question_link"
@@ -56,6 +56,11 @@ javascript:
 
     var Question = {
       template: "#question-show-template",
+      data () {
+        return {
+          timeout_id: null
+        }
+      },
       computed: {
         // ID 从 1 开始
         test_id () {
@@ -88,8 +93,9 @@ javascript:
       },
       methods: {
         select_option (index) {
+          clearTimeout(this.timeout_id);
           this.question.checked_index = index;
-          setTimeout(() => {
+          this.timeout_id = setTimeout(() => {
             if (this.is_last) {
               this.$router.push(this.result_link);
             } else {
@@ -98,9 +104,6 @@ javascript:
           }, 200);
         }
       },
-      beforeCreate () {
-
-      }
     }
 
     var Result = {
