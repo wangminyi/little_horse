@@ -15,6 +15,12 @@ template#entry-index-template
         .answer
           | {{ $root.result(test) }}
 
+template#test-show-template
+  #test-show
+    .meta
+      | {{ test.title }}
+    router-view
+
 template#question-show-template
   #question-show
     .question
@@ -50,6 +56,15 @@ javascript:
       data () {
         return {
           tests: this.$root.tests
+        }
+      }
+    }
+
+    var Test = {
+      template: "#test-show-template",
+      data () {
+        return {
+          test: this.$root.tests[this.$route.params.test_id * 1 - 1]
         }
       }
     }
@@ -130,8 +145,14 @@ javascript:
       base: '/tests',
       routes: [
         { path: '/', component: Index },
-        { path: '/:test_id/questions/:question_id', component: Question },
-        { path: '/:test_id/result', component: Result },
+        {
+          path: '/:test_id',
+          component: Test,
+          children: [
+            { path: 'questions/:question_id', component: Question },
+            { path: 'result', component: Result },
+          ]
+        },
         { path: '*', component: NotFound },
       ]
     });
