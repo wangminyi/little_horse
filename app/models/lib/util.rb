@@ -1,5 +1,44 @@
 class Util
   class << self
+    def import_product
+      base_url = "http://m.17dutyfree.com"
+      img_base_url = "http://img.17dutyfree.com/pimg/1000"
+      # 9..48
+      ActiveRecord::Base.transaction do
+        (9..35).each do |id|
+          page = 0
+          loop do
+            page += 1
+            url = "#{base_url}/category/#{id}?format=json&p=#{page}"
+            json = []
+            begin
+              json = JSON.parse(RestClient.get(url).body)
+            rescue
+            end
+            break if json.length == 0
+            json.each do |product_json|
+              next if Product.exists?(image: "#{img_base_url}/#{product_json["image"]}")
+              product = Product.create!(
+                name: product_json["name"],
+                brand: product_json["brand"],
+                image: "#{img_base_url}/#{product_json["image"]}"
+              )
+              detail_url = "#{base_url}#{product_json["url"]}"
+              detail = RestClient.get(detail_url).body
+              airports = detail.scan(Regexp.new(">([^<]*机场)<")).flatten
+              prices = detail.scan(Regexp.new("¥ ([0-9\.]*)<")).flatten
+              airports.each.with_index do |airport, index|
+                product.prices.create!(
+                  location: airport,
+                  price: (prices[index].to_f * 100).to_i,
+                )
+              end
+            end
+          end
+        end
+      end
+    end
+
     def import_test_data
       data = Docx::Document.open(File.join(Rails.root, "data_files/test.docx")).paragraphs.first.to_s
       # 59 Question
