@@ -62,15 +62,20 @@ javascript:
 
     var Test = {
       template: "#test-show-template",
+      props: ["test_id"],
       data () {
         return {
-          test: this.$root.tests[this.$route.params.test_id * 1 - 1]
+          test: this.$root.tests[this.test_id * 1 - 1]
         }
       }
     }
 
     var Question = {
       template: "#question-show-template",
+      props: [
+        "test_id",
+        "question_id",
+      ],
       data () {
         return {
           timeout_id: null
@@ -78,29 +83,26 @@ javascript:
       },
       computed: {
         // ID 从 1 开始
-        test_id () {
-          return this.$route.params.test_id * 1;
-        },
-        question_id () {
-          return this.$route.params.question_id * 1;
+        parsed_question_id () {
+          return this.question_id * 1;
         },
         questions () {
-          return this.$root.tests[this.test_id - 1].questions;
+          return this.$parent.test.questions;
         },
         question () {
-          return this.questions[this.question_id - 1];
+          return this.questions[this.parsed_question_id - 1];
         },
         is_first () {
-          return this.question_id === 1;
+          return this.parsed_question_id === 1;
         },
         is_last () {
-          return this.question_id === this.questions.length;
+          return this.parsed_question_id === this.questions.length;
         },
         prev_question_link () {
-          return (this.question_id - 1) + "";
+          return (this.parsed_question_id - 1) + "";
         },
         next_question_link () {
-          return (this.question_id + 1) + "";
+          return (this.parsed_question_id + 1) + "";
         },
         result_link () {
           return "/" + this.test_id + "/result";
@@ -124,11 +126,8 @@ javascript:
     var Result = {
       template: "#test-result",
       computed: {
-        test_id () {
-          return this.$route.params.test_id * 1;
-        },
         test () {
-          return this.$root.tests[this.test_id - 1];
+          return this.$parent.test;
         },
         result () {
           return this.$root.result(this.test);
@@ -148,8 +147,9 @@ javascript:
         {
           path: '/:test_id',
           component: Test,
+          props: true,
           children: [
-            { path: 'questions/:question_id', component: Question },
+            { path: 'questions/:question_id', component: Question, props: true },
             { path: 'result', component: Result },
           ]
         },
