@@ -53,6 +53,7 @@ gem 'carrierwave'
 gem 'docx'
 gem 'vuejs-rails'
 gem 'rest-client'
+gem 'font-awesome-sass'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

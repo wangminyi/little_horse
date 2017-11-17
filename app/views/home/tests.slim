@@ -4,20 +4,28 @@
 
 template#entry-index-template
   #entry-index
-    .entry-block (
+    .title
+      | 请测试您的肤质:
+    .subtitle
+      | 根据选择提供精准服务
+    template (
       v-for="(test, index) in tests"
     )
       router-link :to="(index + 1) + '/questions/1'"
-        .title
-          | {{ test.title}}
-        .desc
-          | {{ test.desc}}
-        .answer
-          | {{ $root.result(test) }}
+        .entry-block
+          .test-title
+            | {{ test.title }}
+          /.desc
+            | {{ test.desc}}
+          /.answer
+            | {{ $root.result(test) }}
 
 template#test-show-template
   #test-show
-    .meta
+    .header
+      router-link to="/"
+        .back
+          i.fa.fa-chevron-left
       | {{ test.title }}
     router-view
 
@@ -28,13 +36,16 @@ template#question-show-template
     .options
       .option (
         v-for="(option, index) in question.answers"
-        :class="{checked: question.checked_index === index}"
         @click="select_option(index)"
       )
-        | {{ option }}
-    / router-link v-if="!is_first" :to="prev_question_link"
-    /   .btn.btn-primary
-    /     | 上一题
+        i.fa (
+          :class="question.checked_index === index ? 'fa-check-circle-o' : 'fa-circle-thin'"
+        )
+        span
+          | {{ option }}
+    router-link v-if="!is_first" :to="prev_question_link"
+      .custom-btn.prev-question
+        | 上一题
     / router-link v-if="!is_last" :to="next_question_link"
     /   .btn.btn-primary
     /     | 下一题
@@ -44,8 +55,8 @@ template#test-result
     .result
       | {{ "测试结果： " + result }}
     router-link to="/"
-      .btn.btn-primary
-        | 返回
+      .custom-btn
+        | 继续其他测试
 
 
 
@@ -169,7 +180,7 @@ javascript:
         selected_test: null,
         tests: [
           {
-            title: "干性皮肤（Dry - D）VS. 油性皮肤(Oil - O)",
+            title: "干性皮肤 vs 油性皮肤",
             desc: "通过回答这部分的问题，可以准确分析出皮肤的含水状况和出油程度。研究表明，虽然许多人对于自己属于油性或干性皮肤显得很确定，但其实这些预见往往并不准确。别让自己的那些成见或主观臆断影响你的回答，只要根据实际情况来选择就对了。",
             questions: gon.test_data[0],
             summary: [
@@ -179,7 +190,7 @@ javascript:
               [44, "非常油的皮肤"],
             ]
           }, {
-            title: "敏感性皮肤（Sensitive－S）VS.耐受性皮肤(Resistant－R)",
+            title: "敏感性皮肤 vs 耐受性皮肤",
             desc: "通过回答这部分的问题，可以准确分析出你的皮肤趋向于发生各种敏感肌肤症状的程度，所有的面疱（痤疮/痘痘）、红肿、潮红、发痒都属于皮肤的敏感症状。",
             questions: gon.test_data[1],
             summary: [
@@ -189,7 +200,7 @@ javascript:
               [72, "非常油的皮肤"],
             ]
           }, {
-            title: "色素沉着性皮肤（Pigmented－P）VS.非色素沉着性皮肤(Non-pigmented－N)",
+            title: "色素沉着性皮肤 vs 非色素沉着性皮肤",
             desc: "通过回答这部分的问题，测试你是否有形成黑色素的倾向。黑色素会使你受到日晒后的皮肤出现黑斑、雀斑以及一些深色区域。反过来说，黑色素的生成也是皮肤自我保护的反应，它会通过使肤色变深来保护你不被晒伤。",
             questions: gon.test_data[2],
             summary: [
@@ -197,7 +208,7 @@ javascript:
               [45, "色素沉着性皮肤（简称“色”型或P Type）"],
             ]
           }, {
-            title: "皱纹性皮肤（wrinkled－W）VS.紧致性皮肤Tight－T) ",
+            title: "皱纹性皮肤 vs 紧致性皮肤",
             desc: "通过回答这部分的问题，可以准确分析出你的皮肤是否属于容易生出皱纹的类型，以及你现在的已经出现的皱纹危机。",
             questions: gon.test_data[3],
             summary: [
@@ -244,3 +255,6 @@ javascript:
       router,
     }).$mount("#main-root")
   })
+
+- content_for :page_css
+  = stylesheet_link_tag 'pages/tests'
